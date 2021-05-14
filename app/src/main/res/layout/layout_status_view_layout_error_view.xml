@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_error" />
+
+        <TextView
+            android:id="@id/tv_error_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:text="加载失败"
+            android:textColor="#797979"
+            android:textSize="20sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:text="请检查网络连接或重试"
+            android:textColor="#C5C5C5"
+            android:textSize="15sp" />
+        <TextView
+            android:id="@id/btn_reload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="35dp"
+            android:paddingRight="35dp"
+            android:text="重试"
+            android:alpha="0.5"
+            android:background="@drawable/bg_reload"
+            android:textColor="#ffffff"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+</RelativeLayout>
