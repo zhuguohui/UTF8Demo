@@ -25,10 +25,22 @@ public class User {
     @Ignore
     private String smsContent;
 
+    @Ignore
+    private String smsTemplate;
+
     /**
      * 发送短信的时候要显示的名字
      */
     private String smsName;
+
+
+    public String getSmsTemplate() {
+        return smsTemplate;
+    }
+
+    public void setSmsTemplate(String smsTemplate) {
+        this.smsTemplate = smsTemplate;
+    }
 
     public int getUid() {
         return uid;

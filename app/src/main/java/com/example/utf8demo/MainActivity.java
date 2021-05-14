@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onContentOk(String content) {
                 for (User user : userList) {
+                    user.setSmsTemplate(content);
                     String sms = content.replace("@name", user.getSmsName());
                     user.setSmsContent(sms);
                 }

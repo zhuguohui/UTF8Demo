@@ -9,6 +9,7 @@ import android.widget.CompoundButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.utf8demo.NickNameDialog;
 import com.example.utf8demo.R;
 import com.example.utf8demo.db.User;
 
@@ -42,8 +43,8 @@ public class UserAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         User user = userList.get(position);
         holder.setText(R.id.tv_name, user.getName())
                 .setText(R.id.tv_phone, user.getPhone())
-                .setText(R.id.tv_nick_name,"昵称:"+user.getSmsName())
-                .setText(R.id.tv_content,user.getSmsContent());
+                .setText(R.id.tv_nick_name, "昵称:" + user.getSmsName())
+                .setText(R.id.tv_content, user.getSmsContent());
         CheckBox checkBox = holder.itemView.findViewById(R.id.checkbox);
         checkBox.setChecked(set.contains(user));
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -52,6 +53,23 @@ public class UserAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             } else {
                 set.remove(user);
             }
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            //修改昵称
+            NickNameDialog dialog = new NickNameDialog(holder.itemView.getContext(),user.getSmsName());
+            dialog.setOnContentOk(new NickNameDialog.OnContentOk() {
+                @Override
+                public void onContentOk(String content) {
+                    user.setSmsName(content);
+                    if (user.getSmsTemplate() != null) {
+                        String sms = user.getSmsTemplate().replace("@name", user.getSmsName());
+                        user.setSmsContent(sms);
+                    }
+                    notifyItemChanged(position);
+                }
+            });
+            dialog.show();
         });
     }
 
