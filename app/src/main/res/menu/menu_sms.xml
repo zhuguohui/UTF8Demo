@@ -2,9 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <item
-        android:id="@+id/build_sms"
-        android:title="生成短信" />
+
     <item
         android:id="@+id/send_sms"
         android:title="发送短信" />

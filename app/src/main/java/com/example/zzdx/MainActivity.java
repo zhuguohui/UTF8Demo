@@ -1,4 +1,4 @@
-package com.example.utf8demo;
+package com.example.zzdx;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,25 +9,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.service.autofill.UserData;
-import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.utf8demo.adapter.UserAdapter;
-import com.example.utf8demo.db.AppDatabase;
-import com.example.utf8demo.db.User;
-import com.example.utf8demo.db.UserDao;
+import com.example.zzdx.adapter.UserAdapter;
+import com.example.zzdx.db.AppDatabase;
+import com.example.zzdx.db.SMSItem;
+import com.example.zzdx.db.User;
+import com.example.zzdx.db.UserDao;
 import com.example.view.StatusViewLayout;
 
 import java.util.ArrayList;
@@ -202,10 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 userAdapter.selectAll();
                 break;
             case R.id.create_sms:
-                Intent intent = new Intent(this, SMSActivity.class);
-                ArrayList<User> users = new ArrayList<>(userAdapter.getSet());
-                intent.putExtra(SMSActivity.KEY_USER_LIST, users);
-                startActivity(intent);
+                createSms();
+
                 break;
             case R.id.build_add_contact:
                 addContact();
@@ -229,6 +220,31 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
+    private void createSms() {
+        SMSDialog smsDialog = new SMSDialog(this);
+        smsDialog.setOnSmsContentOk(new SMSDialog.OnSmsContentOk() {
+            @Override
+            public void onContentOk(String content) {
+                ArrayList<SMSItem> smsItems=new ArrayList<>();
+                for (User user:userAdapter.getSet()) {
+                    SMSItem smsItem=new SMSItem();
+                    smsItem.setId(System.currentTimeMillis()+"to"+user.getPhone());
+                    smsItem.setUser(user);
+                    smsItem.setSmsTemplate(content);
+                    String smsContent = content.replace("@name", smsItem.getUser().getSmsName());
+                    smsItem.setSmsContent(smsContent);
+                    smsItems.add(smsItem);
+                }
+
+                Intent intent = new Intent(MainActivity.this, SMSActivity.class);
+                intent.putExtra(SMSActivity.KEY_SMS_LIST, smsItems);
+                startActivity(intent);
+            }
+        });
+        smsDialog.show();
+
+    }
     private void addContact() {
         ContactDialog contactDialog = new ContactDialog(this);
         contactDialog.setOnContactCreateListener(new ContactDialog.onCreateContactListener() {
@@ -244,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                         userList.add(0, user);
                         userAdapter.notifyItemInserted(0);
                         recyclerView.scrollToPosition(0);
+                        statusViewLayout.showContent();
                     });
                 }).start();
             }

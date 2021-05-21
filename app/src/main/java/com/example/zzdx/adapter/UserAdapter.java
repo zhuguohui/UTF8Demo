@@ -1,4 +1,4 @@
-package com.example.utf8demo.adapter;
+package com.example.zzdx.adapter;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -6,15 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.utf8demo.NickNameDialog;
-import com.example.utf8demo.R;
-import com.example.utf8demo.db.AppDatabase;
-import com.example.utf8demo.db.User;
+import com.example.zzdx.NickNameDialog;
+import com.example.zzdx.R;
+import com.example.zzdx.db.AppDatabase;
+import com.example.zzdx.db.User;
 
 import java.util.HashSet;
 import java.util.List;

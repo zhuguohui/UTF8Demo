@@ -1,4 +1,4 @@
-package com.example.utf8demo;
+package com.example.zzdx;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,10 +16,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.utf8demo.adapter.SMSAdapter;
-import com.example.utf8demo.db.SMSItem;
-import com.example.utf8demo.db.SMSState;
-import com.example.utf8demo.db.User;
+import com.example.zzdx.adapter.SMSAdapter;
+import com.example.zzdx.db.SMSItem;
+import com.example.zzdx.db.SMSState;
+import com.example.zzdx.db.User;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,7 +28,7 @@ import java.util.UUID;
 public class SMSActivity extends AppCompatActivity {
     private static final String SMS_ACTION = "ZGH_SEND_ACTION";
     private static final String SMS_RECEIVE_ACTION = "ZGH_RECEIVE_ACTION";
-    public static final String KEY_USER_LIST = "key_user_list";
+    public static final String KEY_SMS_LIST = "key_sms_list";
 
     private BroadcastReceiver smsBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -77,7 +77,7 @@ public class SMSActivity extends AppCompatActivity {
             }
         }
     };
-    ArrayList<User> userList = new ArrayList<>();
+
     ArrayList<SMSItem> smsList = new ArrayList<>();
 
     private IntentFilter mSMSResultFilter = new IntentFilter();
@@ -88,14 +88,7 @@ public class SMSActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_s_m_s);
         setTitle("发送短信");
-        userList = (ArrayList<User>) getIntent().getSerializableExtra(KEY_USER_LIST);
-
-        for (User user : userList) {
-            SMSItem sms = new SMSItem();
-            sms.setId(System.currentTimeMillis() + UUID.randomUUID().toString());
-            sms.setUser(user);
-            smsList.add(sms);
-        }
+        smsList = (ArrayList<SMSItem>) getIntent().getSerializableExtra(KEY_SMS_LIST);
 
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
@@ -121,9 +114,6 @@ public class SMSActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case R.id.build_sms:
-                createSms();
-                break;
             case R.id.send_sms:
                 doSent();
                 break;
@@ -133,22 +123,7 @@ public class SMSActivity extends AppCompatActivity {
         return true;
     }
 
-    private void createSms() {
-        SMSDialog smsDialog = new SMSDialog(this);
-        smsDialog.setOnSmsContentOk(new SMSDialog.OnSmsContentOk() {
-            @Override
-            public void onContentOk(String content) {
-                for (SMSItem sms : smsList) {
-                    sms.setSmsTemplate(content);
-                    String smsContent = content.replace("@name", sms.getUser().getSmsName());
-                    sms.setSmsContent(smsContent);
-                }
-                smsAdapter.notifyDataSetChanged();
-            }
-        });
-        smsDialog.show();
 
-    }
 
     private void doSent() {
         SmsManager smsManager = SmsManager.getDefault();

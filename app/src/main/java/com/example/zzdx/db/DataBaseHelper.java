@@ -1,4 +1,4 @@
-package com.example.utf8demo.db;
+package com.example.zzdx.db;
 
 import androidx.annotation.NonNull;
 import androidx.room.DatabaseConfiguration;

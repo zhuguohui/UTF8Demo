@@ -1,4 +1,4 @@
-package com.example.utf8demo.db;
+package com.example.zzdx.db;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.utf8demo.BuildConfig;
-import com.example.utf8demo.R;
+import com.example.zzdx.BuildConfig;
+import com.example.zzdx.R;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.example.utf8demo;
+package com.example.zzdx;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -8,21 +8,25 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 
-import com.example.utf8demo.tools.DensityUtil;
+import com.example.zzdx.tools.DensityUtil;
 
 /**
  * @author zhuguohui
  * @description:
  * @date :2021/5/14 15:21
  */
-public class SMSDialog extends Dialog {
-    public SMSDialog(@NonNull Context context) {
+public class NickNameDialog extends Dialog {
+    public NickNameDialog(@NonNull Context context, String oldName) {
         super(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.layout_sms_dialog, null, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.layout_nick_name_dialog, null, false);
         setContentView(view);
         getWindow().getAttributes().width = DensityUtil.dip2px(context, 300);
-        getWindow().getAttributes().height = DensityUtil.dip2px(context, 300);
+        getWindow().getAttributes().height = DensityUtil.dip2px(context, 200);
         getWindow().setAttributes(getWindow().getAttributes());
+        if (oldName != null) {
+            EditText editText = getWindow().getDecorView().findViewById(R.id.et_content);
+            editText.setText(oldName);
+        }
         view.findViewById(R.id.btn_ok).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -36,13 +40,13 @@ public class SMSDialog extends Dialog {
         });
     }
 
-    OnSmsContentOk onSmsContentOk;
+    OnContentOk onSmsContentOk;
 
-    public void setOnSmsContentOk(OnSmsContentOk onSmsContentOk) {
+    public void setOnContentOk(OnContentOk onSmsContentOk) {
         this.onSmsContentOk = onSmsContentOk;
     }
 
-    public interface OnSmsContentOk {
+    public interface OnContentOk {
         void onContentOk(String content);
     }
 

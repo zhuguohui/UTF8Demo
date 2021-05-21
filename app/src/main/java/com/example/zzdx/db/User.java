@@ -1,8 +1,6 @@
-package com.example.utf8demo.db;
+package com.example.zzdx.db;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;

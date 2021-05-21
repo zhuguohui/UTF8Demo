@@ -1,7 +1,8 @@
-package com.example.utf8demo.db;
+package com.example.zzdx.db;
 
 import androidx.room.Ignore;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Objects;
  * @description:
  * @date :2021/5/21 15:36
  */
-public class SMSItem {
+public class SMSItem implements Serializable {
     private String id;
     private long createTime;
     private long sendTime;

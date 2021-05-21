@@ -1,4 +1,4 @@
-package com.example.utf8demo;
+package com.example.zzdx;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -8,7 +8,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 
-import com.example.utf8demo.tools.DensityUtil;
+import com.example.zzdx.tools.DensityUtil;
 
 /**
  * @author zhuguohui

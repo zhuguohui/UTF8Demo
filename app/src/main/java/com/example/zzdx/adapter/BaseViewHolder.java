@@ -1,4 +1,4 @@
-package com.example.utf8demo.adapter;
+package com.example.zzdx.adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -6,8 +6,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.utf8demo.R;
 
 /**
  * @author zhuguohui
@@ -30,5 +28,13 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
 
     public Context ctx() {
         return itemView.getContext();
+    }
+
+    public BaseViewHolder setTextColor(int id, int color) {
+        View view = itemView.findViewById(id);
+        if (view instanceof TextView) {
+            ((TextView) view).setTextColor(color);
+        }
+        return this;
     }
 }

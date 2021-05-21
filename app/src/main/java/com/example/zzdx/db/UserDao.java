@@ -1,4 +1,4 @@
-package com.example.utf8demo.db;
+package com.example.zzdx.db;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

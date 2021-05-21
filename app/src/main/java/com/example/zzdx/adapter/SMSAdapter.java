@@ -1,4 +1,4 @@
-package com.example.utf8demo.adapter;
+package com.example.zzdx.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.utf8demo.NickNameDialog;
-import com.example.utf8demo.R;
-import com.example.utf8demo.db.SMSItem;
-import com.example.utf8demo.db.User;
+import com.example.zzdx.NickNameDialog;
+import com.example.zzdx.R;
+import com.example.zzdx.db.SMSItem;
+import com.example.zzdx.db.User;
 
 import java.util.List;
 
@@ -43,7 +43,8 @@ public class SMSAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 .setText(R.id.tv_phone, user.getPhone())
                 .setText(R.id.tv_nick_name, "昵称:" + user.getSmsName())
                 .setText(R.id.tv_content, sms.getSmsContent())
-                .setText(R.id.tv_sms_state,sms.getSmsState().getName());
+                .setText(R.id.tv_sms_state,sms.getSmsState().getName())
+                .setTextColor(R.id.tv_sms_state,sms.getSmsState().getColor());
 
 
         holder.itemView.setOnClickListener(v -> {
