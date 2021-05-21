@@ -3,11 +3,19 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file("../ket/zzdx.jks")
+            storePassword 'trsadmin'
+            keyAlias "admin"
+            keyPassword 'trsadmin'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
     defaultConfig {
-        applicationId "com.example.utf8demo"
+        applicationId "com.zgh.zzdx"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
