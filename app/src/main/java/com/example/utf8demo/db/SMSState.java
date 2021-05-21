@@ -7,7 +7,7 @@ package com.example.utf8demo.db;
  */
 public enum SMSState {
 
-    INIT(""), CREATE("创建成功"),SENDDING("发送中"),SEND_SUCCESS("发送成功"),SEND_FAIL("发送失败");
+    INIT(""), CREATE("创建成功"),SENDDING("发送中"),SEND_SUCCESS("发送成功"),SEND_FAIL("发送失败"),RECEIVE("已接收");
 
 
     String name;

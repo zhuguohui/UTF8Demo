@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class SMSActivity extends AppCompatActivity {
-    private static final String SMS_ACTION = "ZZZ_ACTION_RAYCLEAR_SEND_SMS";
+    private static final String SMS_ACTION = "ZGH_SEND_ACTION";
+    private static final String SMS_RECEIVE_ACTION = "ZGH_RECEIVE_ACTION";
     public static final String KEY_USER_LIST = "key_user_list";
 
     private BroadcastReceiver smsBroadcastReceiver = new BroadcastReceiver() {
@@ -33,7 +34,6 @@ public class SMSActivity extends AppCompatActivity {
             System.out.println("ACTION_RAYCLEAR_SEND_SMS");
 
             if (SMS_ACTION.equals(intent.getAction())) {
-
                 String id = intent.getStringExtra("KEY_CONTACT_PHONE");
                 Log.i("zzz", "code=" + getResultCode() + " id=" + id);
                 SMSItem smsItem = new SMSItem();
@@ -60,6 +60,22 @@ public class SMSActivity extends AppCompatActivity {
         }
     };
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //表示对方成功收到短信
+            String id = intent.getStringExtra("KEY_CONTACT_PHONE");
+            SMSItem smsItem = new SMSItem();
+            smsItem.setId(id);
+            int index = smsList.indexOf(smsItem);
+            if (index >= 0) {
+                SMSItem item = smsList.get(index);
+                item.setSmsState(SMSState.RECEIVE);
+                smsAdapter.notifyItemChanged(index);
+            }
+        }
+    };
     ArrayList<User> userList = new ArrayList<>();
     ArrayList<SMSItem> smsList = new ArrayList<>();
 
@@ -86,8 +102,9 @@ public class SMSActivity extends AppCompatActivity {
         recyclerView.setAdapter(smsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mSMSResultFilter.addAction(SMS_ACTION);
-        registerReceiver(smsBroadcastReceiver, mSMSResultFilter);
+
+        registerReceiver(smsBroadcastReceiver, new IntentFilter(SMS_ACTION));
+        registerReceiver(receiver, new IntentFilter(SMS_RECEIVE_ACTION));
     }
 
 
@@ -136,12 +153,24 @@ public class SMSActivity extends AppCompatActivity {
         SmsManager smsManager = SmsManager.getDefault();
         for (SMSItem smsItem : smsList) {
             smsItem.setSmsState(SMSState.SENDDING);
+
             Intent sendIntent = new Intent(SMS_ACTION);
             sendIntent.putExtra("KEY_CONTACT_PHONE", smsItem.getId());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            smsManager.sendTextMessage(smsItem.getUser().getPhone(), null, smsItem.getSmsContent(), pendingIntent, null);
+            Intent receiveIntent = new Intent(SMS_RECEIVE_ACTION);
+            receiveIntent.putExtra("KEY_CONTACT_PHONE", smsItem.getId());
+            PendingIntent receivePendingIntent = PendingIntent.getBroadcast(this, 0, receiveIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            smsManager.sendTextMessage(smsItem.getUser().getPhone(), null, smsItem.getSmsContent(), pendingIntent, receivePendingIntent);
         }
         smsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(smsBroadcastReceiver);
+        unregisterReceiver(receiver);
     }
 }
