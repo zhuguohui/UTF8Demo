@@ -22,6 +22,7 @@ import com.example.utf8demo.db.SMSState;
 import com.example.utf8demo.db.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.UUID;
 
 public class SMSActivity extends AppCompatActivity {
@@ -156,11 +157,11 @@ public class SMSActivity extends AppCompatActivity {
 
             Intent sendIntent = new Intent(SMS_ACTION);
             sendIntent.putExtra("KEY_CONTACT_PHONE", smsItem.getId());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, sendIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) Calendar.getInstance().getTimeInMillis(), sendIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             Intent receiveIntent = new Intent(SMS_RECEIVE_ACTION);
             receiveIntent.putExtra("KEY_CONTACT_PHONE", smsItem.getId());
-            PendingIntent receivePendingIntent = PendingIntent.getBroadcast(this, 0, receiveIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent receivePendingIntent = PendingIntent.getBroadcast(this,  (int) Calendar.getInstance().getTimeInMillis(), receiveIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             smsManager.sendTextMessage(smsItem.getUser().getPhone(), null, smsItem.getSmsContent(), pendingIntent, receivePendingIntent);
         }
