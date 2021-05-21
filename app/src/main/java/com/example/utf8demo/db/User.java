@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -13,7 +14,9 @@ import java.util.Objects;
  * @date :2021/5/14 13:34
  */
 @Entity
-public class User {
+public class User implements Serializable {
+
+
     @PrimaryKey(autoGenerate = true)
     private int uid;
 
@@ -22,11 +25,7 @@ public class User {
 
     private String phone;
 
-    @Ignore
-    private String smsContent;
 
-    @Ignore
-    private String smsTemplate;
 
     /**
      * 发送短信的时候要显示的名字
@@ -34,13 +33,7 @@ public class User {
     private String smsName;
 
 
-    public String getSmsTemplate() {
-        return smsTemplate;
-    }
 
-    public void setSmsTemplate(String smsTemplate) {
-        this.smsTemplate = smsTemplate;
-    }
 
     public int getUid() {
         return uid;
@@ -90,11 +83,5 @@ public class User {
         return Objects.hash(uid, name, phone, smsName);
     }
 
-    public String getSmsContent() {
-        return smsContent;
-    }
 
-    public void setSmsContent(String smsContent) {
-        this.smsContent = smsContent;
-    }
 }

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +19,8 @@ import android.os.Bundle;
 import android.service.autofill.UserData;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -33,41 +36,12 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String SMS_ACTION = "ZZZ_ACTION_RAYCLEAR_SEND_SMS";
 
-    private BroadcastReceiver smsBroadcastReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            System.out.println("ACTION_RAYCLEAR_SEND_SMS");
 
-            if (SMS_ACTION.equals(intent.getAction())) {
-                boolean issucess = false;
-                String phone = intent.getStringExtra("KEY_CONTACT_PHONE");
-                switch (getResultCode()) {
-                    case RESULT_OK:
-
-                        issucess = true;
-
-//                        System.out.println("发送成功");
-                        Log.i("zzz", phone + "发送成功");
-                        break;
-
-                    default:
-
-                        issucess = false;
-
-                        Log.i("zzz", phone + "发送失败");
-
-                        break;
-
-                }
-            }
-        }
-    };
-    private IntentFilter mSMSResultFilter = new IntentFilter();
     private StatusViewLayout statusViewLayout;
     private List<User> userList = new ArrayList<>();
     private UserAdapter userAdapter;
-    private Button btn_read;
+    private RecyclerView recyclerView;
 
     private boolean checkPermission(String permission) {
         return ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_GRANTED;
@@ -82,57 +56,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setTitle("选择联系人");
-
-        mSMSResultFilter.addAction(SMS_ACTION);
-        registerReceiver(smsBroadcastReceiver, mSMSResultFilter);
         statusViewLayout = findViewById(R.id.statusLayout);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
         userAdapter = new UserAdapter(userList);
         recyclerView.setAdapter(userAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //从数据库读取联系人
         loadDataFromDB();
-
-
-        btn_read = findViewById(R.id.btn_read);
-        findViewById(R.id.btn_create_name).setOnClickListener(v -> createName());
-        findViewById(R.id.btn_create_sms).setOnClickListener(v -> createSms());
-
-        findViewById(R.id.btn_send).setOnClickListener(v -> {
-            for (int i = 0; i < 1; i++) {
-                Intent sendintent = new Intent(SMS_ACTION);
-                sendintent.putExtra("KEY_CONTACT_PHONE", String.format("15708182104%d", i));
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, sendintent, PendingIntent.FLAG_UPDATE_CURRENT);
-                SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage("15708182104", null, "测试短信" + i, pendingIntent, null);
-
-            }
-        });
-
-        findViewById(R.id.btn_read).setOnClickListener(v -> {
-            readContacts();
-
-        });
     }
 
-
-    private void createSms() {
-        SMSDialog smsDialog = new SMSDialog(this);
-        smsDialog.setOnSmsContentOk(new SMSDialog.OnSmsContentOk() {
-            @Override
-            public void onContentOk(String content) {
-                for (User user : userList) {
-                    user.setSmsTemplate(content);
-                    String sms = content.replace("@name", user.getSmsName());
-                    user.setSmsContent(sms);
-                }
-                userAdapter.notifyDataSetChanged();
-            }
-        });
-        smsDialog.show();
-
-    }
 
     private Set<String> nickSet = new HashSet<>();
 
@@ -145,27 +78,30 @@ public class MainActivity extends AppCompatActivity {
         nickSet.add("姨");
     }
 
+    private String getNickName(String name) {
+        boolean haveNickName = false;
+        for (String nickName : nickSet) {
+            if (name.contains(nickName)) {
+                haveNickName = true;
+                break;
+            }
+        }
+        if (haveNickName) {
+            //已经设置了昵称，不处理
+            return name;
+        }
+        if (name.length() == 3) {
+            //三个字的名字截取后面两个
+            return name.substring(1);
+        } else {
+            return name;
+        }
+    }
+
     private void createName() {
         for (User user : userList) {
             String name = user.getName();
-            boolean haveNickName = false;
-            for (String nickName : nickSet) {
-                if (name.contains(nickName)) {
-                    haveNickName = true;
-                    break;
-                }
-            }
-            if (haveNickName) {
-                //已经设置了昵称，不处理
-                user.setSmsName(name);
-                continue;
-            }
-            if (name.length() == 3) {
-                //三个字的名字截取后面两个
-                user.setSmsName(name.substring(1));
-            } else {
-                user.setSmsName(name);
-            }
+            user.setSmsName(getNickName(name));
 
         }
         new Thread(() -> {
@@ -178,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void readContacts() {
         statusViewLayout.showLoading();
-        btn_read.setText("正在读取");
-        btn_read.setEnabled(false);
+
         new Thread(() -> {
             UserDao dao = AppDatabase.getInstance(this).userDao();
             List<User> insertUserList = new ArrayList<>();
@@ -219,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
             String msg = "更新" + updateCount + "个联系人 新增" + addCount + "个联系人";
             getWindow().getDecorView().post(() -> {
-                btn_read.setText("读取联系人");
-                btn_read.setEnabled(true);
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
                 loadDataFromDB();
             });
@@ -244,6 +177,78 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }).start();
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    //复写，菜单响应事件
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.read_contacts:
+                readContacts();
+                break;
+
+            case R.id.build_nick_name:
+                createName();
+                break;
+            case R.id.select_all:
+                userAdapter.selectAll();
+                break;
+            case R.id.create_sms:
+                Intent intent = new Intent(this, SMSActivity.class);
+                ArrayList<User> users = new ArrayList<>(userAdapter.getSet());
+                intent.putExtra(SMSActivity.KEY_USER_LIST, users);
+                startActivity(intent);
+                break;
+            case R.id.build_add_contact:
+                addContact();
+
+                break;
+            case R.id.clear_contacts:
+                new Thread(()->{
+                    UserDao userDao= AppDatabase.getInstance(this).userDao();
+                    for(User user:userList){
+                        userDao.delete(user);
+                    }
+                    userList.clear();
+                    runOnUiThread(()->{
+                        userAdapter.notifyDataSetChanged();
+                    });
+                }).start();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    private void addContact() {
+        ContactDialog contactDialog = new ContactDialog(this);
+        contactDialog.setOnContactCreateListener(new ContactDialog.onCreateContactListener() {
+            @Override
+            public void onContactCreated(String name, String phone) {
+                User user = new User();
+                user.setName(name);
+                user.setPhone(phone);
+                user.setSmsName(getNickName(name));
+                new Thread(() -> {
+                    AppDatabase.getInstance(MainActivity.this).userDao().insertAll(user);
+                    runOnUiThread(() -> {
+                        userList.add(0, user);
+                        userAdapter.notifyItemInserted(0);
+                        recyclerView.scrollToPosition(0);
+                    });
+                }).start();
+            }
+        });
+        contactDialog.show();
     }
 
 

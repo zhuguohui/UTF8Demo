@@ -1,5 +1,6 @@
 package com.example.utf8demo.adapter;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
@@ -25,5 +26,9 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
             ((TextView) view).setText(content);
         }
         return this;
+    }
+
+    public Context ctx() {
+        return itemView.getContext();
     }
 }

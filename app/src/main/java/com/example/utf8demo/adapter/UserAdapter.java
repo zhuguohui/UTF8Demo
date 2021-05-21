@@ -1,5 +1,7 @@
 package com.example.utf8demo.adapter;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.utf8demo.NickNameDialog;
 import com.example.utf8demo.R;
+import com.example.utf8demo.db.AppDatabase;
 import com.example.utf8demo.db.User;
 
 import java.util.HashSet;
@@ -43,10 +46,8 @@ public class UserAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         User user = userList.get(position);
         holder.setText(R.id.tv_name, user.getName())
                 .setText(R.id.tv_phone, user.getPhone())
-                .setText(R.id.tv_nick_name, "昵称:" + user.getSmsName())
-                .setText(R.id.tv_content, user.getSmsContent());
+                .setText(R.id.tv_nick_name, "昵称:" + user.getSmsName());
         CheckBox checkBox = holder.itemView.findViewById(R.id.checkbox);
-        checkBox.setChecked(set.contains(user));
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 set.add(user);
@@ -54,23 +55,60 @@ public class UserAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 set.remove(user);
             }
         });
+        checkBox.setChecked(set.contains(user));
 
+        View ivDelete = holder.itemView.findViewById(R.id.iv_delete);
+        ivDelete.setOnClickListener(v -> {
+            new AlertDialog.Builder(holder.ctx())
+                    .setCancelable(true)
+                    .setMessage("确定删除联系人")
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            new Thread(() -> {
+                                AppDatabase.getInstance(holder.ctx()).userDao().delete(user);
+                                checkBox.post(() -> {
+                                    userList.remove(user);
+                                    notifyItemRemoved(holder.getAdapterPosition());
+                                    dialog.dismiss();
+                                });
+                            }).start();
+
+                        }
+                    })
+                    .create().show();
+
+        });
         holder.itemView.setOnClickListener(v -> {
             //修改昵称
-            NickNameDialog dialog = new NickNameDialog(holder.itemView.getContext(),user.getSmsName());
+            NickNameDialog dialog = new NickNameDialog(holder.itemView.getContext(), user.getSmsName());
             dialog.setOnContentOk(new NickNameDialog.OnContentOk() {
                 @Override
                 public void onContentOk(String content) {
-                    user.setSmsName(content);
-                    if (user.getSmsTemplate() != null) {
-                        String sms = user.getSmsTemplate().replace("@name", user.getSmsName());
-                        user.setSmsContent(sms);
-                    }
-                    notifyItemChanged(position);
+                    new Thread(()->{
+                        user.setSmsName(content);
+                        AppDatabase.getInstance(holder.ctx()).userDao().update(user);
+                        holder.itemView.post(()->{
+                            notifyItemChanged(position);
+                        });
+                    }).start();
                 }
             });
             dialog.show();
         });
+    }
+
+    public Set<User> getSet() {
+        return set;
+    }
+
+    public void selectAll() {
+        if (set.size() > 0) {
+            set.clear();
+        } else {
+            set.addAll(userList);
+        }
+        notifyDataSetChanged();
     }
 
     @Override
